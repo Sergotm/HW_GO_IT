@@ -11,7 +11,6 @@ class Field:
 class Name(Field):# Клас для зберігання імені контакту. Обов'язкове поле.
     pass
 		
-
 class Phone(Field): #Реалізовано валідацію номера телефону (має бути перевірка на 10 цифр)
     def __init__(self, value):
         super().__init__(value)
@@ -32,7 +31,7 @@ class Phone(Field): #Реалізовано валідацію номера те
 class Birthday(Field):
     def __init__(self, value):
         try:
-            self.date = datetime.strptime(value, '%d.%m.%Y').date()
+            self.value = datetime.strptime(value, '%d.%m.%Y').date()
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
 
@@ -41,14 +40,12 @@ class Record: #Клас для зберігання інформації про 
         self.name = Name(name)
         self.phones = []
         self.birthday = None
-        
-    def add_birthday(self, birthday ):
-        birthday = Birthday(birthday)  
-        
+
+    # def add_birthday(self, birthday ):
+    #     birthday = Birthday(birthday) 
        
     def __str__(self):
-        
-        return f"Contact name: {str(self.name)}, phones: {'; '.join(str(p) for p in self.phones)}, birthday: {str(self.birthday)}"
+        return f"Contact name: {str(self.name.value)}, phones: {'; '.join(str(p) for p in self.phones)} birthday: {str(self.birthday)}"
 
     def add_phone(self, phone_number): # Додаємо тел
         self.phones.append(Phone(phone_number))
@@ -82,16 +79,18 @@ class AddressBook(UserDict): #Клас для зберігання та упра
     def __str__(self):
         return '\n'.join(str(record) for record in self.data.values()) 
     
-    def get_upcoming_birthdays(users:list) -> list: # повертає список користувачів, яких потрібно привітати по днях на наступному тижні. Сюда передать Список с словарем
+    def get_upcoming_birthdays(*args) -> list: # повертає список користувачів, яких потрібно привітати по днях на наступному тижні. Сюда передать Список с словарем
+        name, = args
+        
         TODAY_DATE = datetime.today().date()
         n_upcoming_birthdays = []
 
-        for user in users:
-            user['birthday'] = datetime.strptime(user['birthday'], '%Y.%m.%d').date()
+        for user in name:
+            user = datetime.strptime(user['birthday'], '%Y.%m.%d').date()
 
-        for user in users:
+        for user in name:
             # Тут присвоим наш 2024 год учаснику для проверки дальше . / 2012-03-01 -> 2024-03-01
-            birthday_this_year = user["birthday"].replace(year=TODAY_DATE.year)
+            birthday_this_year = user.replace(year=TODAY_DATE.year)
 
             #  Проверка не прошел день рождения
             if birthday_this_year < TODAY_DATE:
@@ -109,7 +108,7 @@ class AddressBook(UserDict): #Клас для зберігання та упра
 
             # Сохраняем дату имя персонажа и дату если оно <= 7 
             if count_day == 0 or count_day <= 7:
-                n_upcoming_birthdays.append({"name": user["name"], "congratulation_date": birthday_this_year})
+                n_upcoming_birthdays.append({name: user, "congratulation_date": birthday_this_year})
 
         return n_upcoming_birthdays
     
@@ -172,22 +171,27 @@ def add_birthday(args, book:AddressBook): # Додати дату народже
     record = book.find(name)
     message = "Birthday added."
     if record:
-        record.birthday = Record(birthday)
+        record.birthday = Birthday(birthday)
         return message
     else:
         None
     
+@input_error
+def show_birthday(args, book:AddressBook): # Показати дату народження для вказаного контакту.////////////////////////Не розумію як зробити це//////////////////////////////////
+    '''Я розумію що потрібно день нарождення витягнути  із book але не розумію як це зробить'''
+    name = args[0]
+    record = book.find(name)
+    return str(record.birthday)      
         
-    
 @input_error
-def show_birthday(args, book:AddressBook): # Показати дату народження для вказаного контакту.
-    # реалізація Аналог show_phone
-    pass
-
-@input_error
-def birthdays(args, book:AddressBook): # Показати дні народження, які відбудуться протягом наступного тижня.
-    # реалізація
-    pass
+def birthdays(*args, book:AddressBook): # Показати дні народження, які відбудуться протягом наступного тижня.
+    name = args
+    for name in book.data:
+        record = book.find(name)
+        return book.get_upcoming_birthdays(str(record))
+        
+    # upcoming_birthdays = book.get_upcoming_birthdays(book.data)
+    # return(f'Список привітань на цьому тижні:{upcoming_birthdays}')
 
 def main():
     book = AddressBook()
@@ -221,7 +225,7 @@ def main():
         elif command == "show-birthday":
             print(show_birthday(args, book))
 
-        elif command == "birthdays":
+        elif command == "birthday":
             print(birthdays(args, book))
 
         else:
@@ -230,3 +234,6 @@ def main():
 if __name__ == "__main__":
     main()
 
+# add Serhii 0981021588
+# add-birthday Serhii 11.04.2000
+# show-birthday Serhii
