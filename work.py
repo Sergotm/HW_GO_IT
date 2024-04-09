@@ -182,7 +182,10 @@ def add_birthday(args, book:AddressBook): # Додати дату народже
 @input_error
 def show_birthday(args, book:AddressBook): # Показати дату народження для вказаного контакту.
     # реалізація Аналог show_phone
-    pass
+    name = args[0]
+    record = book.find(name)
+    if record:
+        record = book(name[])
 
 @input_error
 def birthdays(args, book:AddressBook): # Показати дні народження, які відбудуться протягом наступного тижня.
