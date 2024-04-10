@@ -79,18 +79,17 @@ class AddressBook(UserDict): #Клас для зберігання та упра
     def __str__(self):
         return '\n'.join(str(record) for record in self.data.values()) 
     
-    def get_upcoming_birthdays(*args) -> list: # повертає список користувачів, яких потрібно привітати по днях на наступному тижні. Сюда передать Список с словарем
-        name, = args
-        
+    @staticmethod
+    def get_upcoming_birthdays(users:list) -> list:
         TODAY_DATE = datetime.today().date()
         n_upcoming_birthdays = []
 
-        for user in name:
-            user = datetime.strptime(user['birthday'], '%Y.%m.%d').date()
+        for user in users:
+            user['birthday'] = datetime.strptime(user['birthday'], '%Y.%m.%d').date()
 
-        for user in name:
+        for user in users:
             # Тут присвоим наш 2024 год учаснику для проверки дальше . / 2012-03-01 -> 2024-03-01
-            birthday_this_year = user.replace(year=TODAY_DATE.year)
+            birthday_this_year = user["birthday"].replace(year=TODAY_DATE.year)
 
             #  Проверка не прошел день рождения
             if birthday_this_year < TODAY_DATE:
@@ -108,9 +107,11 @@ class AddressBook(UserDict): #Клас для зберігання та упра
 
             # Сохраняем дату имя персонажа и дату если оно <= 7 
             if count_day == 0 or count_day <= 7:
-                n_upcoming_birthdays.append({name: user, "congratulation_date": birthday_this_year})
+                n_upcoming_birthdays.append({"name": user["name"], "congratulation_date": birthday_this_year})
 
         return n_upcoming_birthdays
+        
+        
     
 def parse_input(user_input): # Тут мы парсим строку в нижний регистр
     cmd, *args = user_input.split()
@@ -122,11 +123,11 @@ def input_error(func):# Це наш декоратор
         try:
             return func(*args, **kwargs)
         except ValueError:
-            return "Enter the argument for the command"
+            return "Enter the argument for the command ValueError"
         except KeyError:
-            return 'Enter the argument for the command'
+            return 'Enter the argument for the command KeyError'
         except IndexError:
-            return 'Enter the argument for the command'
+            return 'Enter the argument for the command IndexError'
 
     return inner
 
@@ -184,11 +185,8 @@ def show_birthday(args, book:AddressBook): # Показати дату наро�
     return str(record.birthday)      
         
 @input_error
-def birthdays(*args, book:AddressBook): # Показати дні народження, які відбудуться протягом наступного тижня.
-    name = args
-    for name in book.data:
-        record = book.find(name)
-        return book.get_upcoming_birthdays(str(record))
+def birthdays(book:AddressBook): # Показати дні народження, які відбудуться протягом наступного тижня.
+    return book.get_upcoming_birthdays(book)
         
     # upcoming_birthdays = book.get_upcoming_birthdays(book.data)
     # return(f'Список привітань на цьому тижні:{upcoming_birthdays}')
@@ -226,7 +224,7 @@ def main():
             print(show_birthday(args, book))
 
         elif command == "birthday":
-            print(birthdays(args, book))
+            print(birthdays(book))
 
         else:
             print("Invalid command.")
