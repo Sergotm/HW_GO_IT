@@ -60,13 +60,13 @@ class Record:  # Клас для зберігання інформації пр�
     def remove_phone(self, phone_number):  # Видаляємо тел
         self.phones = [p for p in self.phones if str(p) != phone_number]
 
-    def edit_phone(self, old_num, new_num):  # редагування номеру
-        for i, num in enumerate(self.phones):
-            if str(num) == old_num:
-                self.phones[i] = Phone(new_num)
-                break
-            else:
-                raise ValueError('Value erorr')
+    def edit_phone(self,old_num, new_num):# редагування номеру
+        for k in self.phones:
+            if k == old_num:
+                old_num = Phone(new_num)
+            break
+        else:
+            raise ValueError('Value erorr')
 
     def find_phone(self, find_num):  # Пошук номеру
         for i, num in enumerate(self.phones):
@@ -100,10 +100,11 @@ class AddressBook(UserDict):  # Клас для зберігання та упр
                 birthday_this_year = birthday_this_year.replace(year=today.year + 1)
 
             if 0 <= (birthday_this_year - today).days <= days:
-                if birthday_this_year.weekday() >= 5:  # субота або неділя
-                    birthday_this_year = self.find_next_weekday(
-                        birthday_this_year, 0
-                    )  # Понеділок
+                if (birthday_this_year.weekday() == 5):  # Субота
+                    birthday_this_year += timedelta(days=2)
+                    
+                elif (birthday_this_year.weekday() == 6):  # Воскресенье
+                    birthday_this_year += timedelta(days=1)
 
                 congratulation_date_str = birthday_this_year.strftime("%Y.%m.%d")
                 upcoming_birthdays.append(
@@ -153,13 +154,13 @@ def add_contact(args, book: AddressBook):  # Тут мы додаем номер
 
 @input_error
 def change_contact(args, book: AddressBook):  # Тут мы меняем старый номер на новый
-    name, phone, *_ = args
+    name, old_num, new_num = args
     record = book.find(name)
+
     if record:
-        record = Record(name)
-        book.add_record(record)
-    if phone:
-        record.add_phone(phone)
+        record.edit_phone(old_num, new_num)
+    if not record:
+        return 'Contact not exist'
     return "Contact added replace."
 
 
@@ -188,7 +189,8 @@ def add_birthday(args, book: AddressBook):  # Додати дату народж
 
 
 @input_error
-def show_birthday(args, book: AddressBook):  # Показати дату народження для вказаного контакту.////////////////////////Не розумію як зробити це//////////////////////////////////
+def show_birthday(args,
+                  book: AddressBook):  # Показати дату народження для вказаного контакту.////////////////////////Не розумію як зробити це//////////////////////////////////
     '''Я розумію що потрібно день нарождення витягнути  із book але не розумію як це зробить'''
     name = args[0]
     record = book.find(name)
@@ -201,10 +203,8 @@ def birthdays(book: AddressBook):  # Показати дні народженн�
     if not len(birthdays):
         return "There are no upcoming birthdays."
     for day in birthdays:
-        return(f"{day}")
-
-    # upcoming_birthdays = book.get_upcoming_birthdays(book.data)
-    # return(f'Список привітань на цьому тижні:{upcoming_birthdays}')
+        print(f"{day}")
+    
 
 
 def main():
@@ -249,6 +249,9 @@ def main():
 if __name__ == "__main__":
     main()
 
-# add Serhii 0981021588
-# add-birthday Serhii 11.04.2000
+# add Serhii 1111111111
+# add Serhii 2222222222
+# change Serhii 1111111111 33333333333
+# add-birthday Serhii 12.04.2000
 # show-birthday Serhii
+
