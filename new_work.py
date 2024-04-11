@@ -61,12 +61,12 @@ class Record:  # Клас для зберігання інформації пр�
         self.phones = [p for p in self.phones if str(p) != phone_number]
 
     def edit_phone(self,old_num, new_num):# редагування номеру
-        for k in self.phones:
-            if k == old_num:
-                old_num = Phone(new_num)
-            break
-        else:
-            raise ValueError('Value erorr')
+        for i, num in enumerate(self.phones):
+            if str(num) == old_num:
+                self.phones[i] = Phone(new_num)
+                break
+            else:
+                raise ValueError('Value erorr')
 
     def find_phone(self, find_num):  # Пошук номеру
         for i, num in enumerate(self.phones):
@@ -199,10 +199,10 @@ def show_birthday(args,
 
 @input_error
 def birthdays(book: AddressBook):  # Показати дні народження, які відбудуться протягом наступного тижня.
-    birthdays = book.get_upcoming_birthdays()
-    if not len(birthdays):
+    birthday = book.get_upcoming_birthdays()
+    if not len(birthday):
         return "There are no upcoming birthdays."
-    for day in birthdays:
+    for day in birthday:
         print(f"{day}")
     
 
