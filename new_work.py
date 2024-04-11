@@ -198,11 +198,11 @@ def show_birthday(args,
 
 
 @input_error
-def birthdays(book: AddressBook):  # Показати дні народження, які відбудуться протягом наступного тижня.
-    birthdays = book.get_upcoming_birthdays()
-    if not len(birthdays):
+def birthday(book: AddressBook):  # Показати дні народження, які відбудуться протягом наступного тижня.
+    birthday = book.get_upcoming_birthdays()
+    if not len(birthday):
         return "There are no upcoming birthdays."
-    for day in birthdays:
+    for day in birthday:
         print(f"{day}")
     
 
@@ -240,7 +240,7 @@ def main():
             print(show_birthday(args, book))
 
         elif command == "birthday":
-            print(birthdays(book))
+            print(birthday(book))
 
         else:
             print("Invalid command.")
