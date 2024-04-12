@@ -65,8 +65,8 @@ class Record:  # Клас для зберігання інформації пр�
             if str(num) == old_num:
                 self.phones[i] = Phone(new_num)
                 break
-            else:
-                raise ValueError('Value erorr')
+        else:
+            raise ValueError('Value erorr')
 
     def find_phone(self, find_num):  # Пошук номеру
         for i, num in enumerate(self.phones):
@@ -198,11 +198,7 @@ def show_birthday(args,
 
 
 @input_error
-<<<<<<< HEAD
 def birthdays(book: AddressBook):  # Показати дні народження, які відбудуться протягом наступного тижня.
-=======
-def birthday(book: AddressBook):  # Показати дні народження, які відбудуться протягом наступного тижня.
->>>>>>> afacf54df95216269d926c64ab1a0bb7c5d442cf
     birthday = book.get_upcoming_birthdays()
     if not len(birthday):
         return "There are no upcoming birthdays."
@@ -244,7 +240,7 @@ def main():
             print(show_birthday(args, book))
 
         elif command == "birthday":
-            print(birthday(book))
+            print(birthdays(book))
 
         else:
             print("Invalid command.")
