@@ -72,7 +72,7 @@ class Record:  # Клас для зберігання інформації пр�
     #     birthday = Birthday(birthday)
 
     def __str__(self):
-        return f""" {'_'*25}\n|Contact name: {str(self.name.value)}\n|Phones: {'; '.join(str(p) for p in self.phones)}\n|Birthday: {str(self.birthday)}\n|{'_'*25} """
+        return f"""{'_'*25}\n|Contact name: {str(self.name.value)}\n|Phones: {'; '.join(str(p) for p in self.phones)}\n|Birthday: {str(self.birthday)}\n|{'_'*25} """
 
     def add_phone(self, phone_number):  # Додаємо тел
         self.phones.append(Phone(phone_number))
@@ -232,6 +232,7 @@ def see_command():
 def main():
     book = load_data()
     print("Welcome to the assistant bot!")
+    print(f" {'_'*43}\n|see_command - Look all the command program |\n|{'_'*43}|")
     messander = None
 
     while messander == None:
@@ -247,6 +248,7 @@ def main():
 
     while True:
         try:
+            
             user_input = input("Enter a command: ")
             command, *args = parse_input(user_input)
 
