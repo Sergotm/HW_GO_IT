@@ -72,8 +72,7 @@ class Record:  # Клас для зберігання інформації пр�
     #     birthday = Birthday(birthday)
 
     def __str__(self):
-        return f"{'_'*25}\nContact name: {str(self.name.value)}\nPhones: {'; '.join(str(p) for p in self.phones)}\nBirthday: {str(self.birthday)}\n{'_'*25}"
-    
+        return f""" {'_'*25}\n|Contact name: {str(self.name.value)}\n|Phones: {'; '.join(str(p) for p in self.phones)}\n|Birthday: {str(self.birthday)}\n|{'_'*25} """
 
     def add_phone(self, phone_number):  # Додаємо тел
         self.phones.append(Phone(phone_number))
@@ -202,7 +201,7 @@ def add_birthday(args, book: AddressBook):  # Додати дату народж
 
 @input_error
 def show_birthday(args,
-                  book: AddressBook):  # Показати дату народження для вказаного контакту.////////////////////////Не розумію як зробити це//////////////////////////////////
+                  book: AddressBook):  # Показати дату народження для вказаного контакту
     '''Я розумію що потрібно день нарождення витягнути  із book але не розумію як це зробить'''
     name = args[0]
     record = book.find(name)
@@ -215,6 +214,20 @@ def birthdays(book: AddressBook):  # Показати дні народженн�
         return "There are no upcoming birthdays."
     for day in birthday:
         print(f"{day}")
+
+def see_command():
+    return f'''
+ {'_'*54}
+|hello         |How can I help you?                    |\n|{'_'*54}|
+|add           |Contact added                          |\n|{'_'*54}|
+|change        |Contact replace                        |\n|{'_'*54}| 
+|phone         |Look at the phone                      |\n|{'_'*54}|           
+|all           |Look at the addres book                |\n|{'_'*54}|            
+|add-birthday  |Birthday added                         |\n|{'_'*54}|       
+|show-birthday |Look at the day birthday users         |\n|{'_'*54}|                    
+|birthday      |Look at the day birthday in the week   |\n|{'_'*54}|                    
+|close / exit  |Close or exit program                  |\n|{'_'*54}|
+'''
 
 def main():
     book = load_data()
@@ -263,6 +276,9 @@ def main():
 
             elif command == "birthday":
                 messander.send_to_user(birthdays(book))
+
+            elif command == 'see_command':
+                messander.send_to_user(see_command())
             
             else:
                 messander.send_to_user("Invalid command.")
