@@ -1,22 +1,32 @@
 from collections import UserDict
+from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
-import pickle
-
-DEBUG = False
 
 import pickle
 
-def save_data(book, filename="Home_Work_GoIT\\Module_8\\addressbook.pkl"):
+def save_data(book, filename="Home_WEB\\addressbook.pkl"):
     with open(filename, "wb") as file:
         pickle.dump(book, file)
 
-def load_data(filename="Home_Work_GoIT\\Module_8\\addressbook.pkl"):
+def load_data(filename="Home_WEB\\addressbook.pkl"):
     try:
         with open(filename, "rb") as f:
             return pickle.load(f)
     except FileNotFoundError:
         return AddressBook()  # Повернення нової адресної книги, якщо файл не знайдено
 
+class Messager(ABC):
+    @abstractmethod
+    def send_to_user(self, massage:str)-> None:
+        pass
+
+class TerminalMessanger(Messager):
+    def send_to_user(self, massage: str) -> None:
+        print(massage)
+
+class WebMessanger(Messager):
+    def send_to_user(self, massage: str) -> None:
+        print(f'Fake output to Web{massage}')
 
 class Field:
     def __init__(self, value):
@@ -25,10 +35,8 @@ class Field:
     def __str__(self):
         return str(self.value)
 
-
 class Name(Field):  # Клас для зберігання імені контакту. Обов'язкове поле.
     pass
-
 
 class Phone(Field):  # Реалізовано валідацію номера телефону (має бути перевірка на 10 цифр)
     def __init__(self, value):
@@ -47,14 +55,12 @@ class Phone(Field):  # Реалізовано валідацію номера т
         else:
             raise ValueError('Value error')
 
-
 class Birthday(Field):
     def __init__(self, value):
         try:
             self.value = datetime.strptime(value, '%d.%m.%Y').date()
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
-
 
 class Record:  # Клас для зберігання інформації про контакт, включаючи ім'я та список телефонів і день його народження
     def __init__(self, name):
@@ -66,7 +72,8 @@ class Record:  # Клас для зберігання інформації пр�
     #     birthday = Birthday(birthday)
 
     def __str__(self):
-        return f"Contact name: {str(self.name.value)}, phones: {'; '.join(str(p) for p in self.phones)} birthday: {str(self.birthday)}"
+        return f"{'_'*25}\nContact name: {str(self.name.value)}\nPhones: {'; '.join(str(p) for p in self.phones)}\nBirthday: {str(self.birthday)}\n{'_'*25}"
+    
 
     def add_phone(self, phone_number):  # Додаємо тел
         self.phones.append(Phone(phone_number))
@@ -86,7 +93,6 @@ class Record:  # Клас для зберігання інформації пр�
         for i, num in enumerate(self.phones):
             if str(num) == find_num:
                 return num
-
 
 class AddressBook(UserDict):  # Клас для зберігання та управління записами.
     def add_record(self, record):
@@ -130,12 +136,10 @@ class AddressBook(UserDict):  # Клас для зберігання та упр
 
         return upcoming_birthdays
 
-
 def parse_input(user_input):  # Тут мы парсим строку в нижний регистр
     cmd, *args = user_input.split()
     cmd = cmd.strip().lower()
     return cmd, *args
-
 
 def input_error(func):  # Це наш декоратор
     def inner(*args, **kwargs):
@@ -149,7 +153,6 @@ def input_error(func):  # Це наш декоратор
             return 'Enter the argument for the command IndexError'
 
     return inner
-
 
 @input_error
 def add_contact(args, book: AddressBook):  # Тут мы додаем номер и имя
@@ -165,7 +168,6 @@ def add_contact(args, book: AddressBook):  # Тут мы додаем номер
         record.add_phone(phone)
     return message
 
-
 @input_error
 def change_contact(args, book: AddressBook):  # Тут мы меняем старый номер на новый
     name, old_num, new_num = args
@@ -177,18 +179,15 @@ def change_contact(args, book: AddressBook):  # Тут мы меняем ста�
         return 'Contact not exist'
     return "Contact added replace."
 
-
 @input_error
 def show_phone(args, book: AddressBook):  # Тут мы выводим номер указаного человека по ключу
     name = args[0]
     record = book.find(name)
     return record
 
-
 @input_error
 def show_all(book: AddressBook):  # Тут ми повертаємо book в любому вигляді
     return book
-
 
 @input_error
 def add_birthday(args, book: AddressBook):  # Додати дату народження для вказаного контакту.
@@ -201,7 +200,6 @@ def add_birthday(args, book: AddressBook):  # Додати дату народж
     else:
         None
 
-
 @input_error
 def show_birthday(args,
                   book: AddressBook):  # Показати дату народження для вказаного контакту.////////////////////////Не розумію як зробити це//////////////////////////////////
@@ -210,7 +208,6 @@ def show_birthday(args,
     record = book.find(name)
     return str(record.birthday)
 
-
 @input_error
 def birthdays(book: AddressBook):  # Показати дні народження, які відбудуться протягом наступного тижня.
     birthday = book.get_upcoming_birthdays()
@@ -218,48 +215,61 @@ def birthdays(book: AddressBook):  # Показати дні народженн�
         return "There are no upcoming birthdays."
     for day in birthday:
         print(f"{day}")
-    
-
 
 def main():
     book = load_data()
     print("Welcome to the assistant bot!")
-    while True:
+    messander = None
 
-        user_input = input("Enter a command: ")
-        command, *args = parse_input(user_input)
-
-        if command in ["close", "exit"]:
-            print("Good bye!")
-            break
-        elif command == "hello":
-            print("How can I help you?")
-
-        elif command == "add":
-            print(add_contact(args, book))
-
-        elif command == 'change':
-            print(change_contact(args, book))
-
-        elif command == 'phone':
-            print(show_phone(args, book))
-
-        elif command == 'all':
-            print(show_all(book))
-
-        elif command == "add-birthday":
-            print(add_birthday(args, book))
-
-        elif command == "show-birthday":
-            print(show_birthday(args, book))
-
-        elif command == "birthday":
-            print(birthdays(book))
-
+    while messander == None:
+        user_qestion = input(f'Choose interface: 1 = Terminal, 2 = Web \n')
+        if user_qestion == '1':
+            messander = TerminalMessanger()
+        elif user_qestion == '2':
+            messander = WebMessanger()
         else:
-            print("Invalid command.")
+            print(f'Incorrect data')
+            messander = None
+            continue
 
-    save_data(book)
+    while True:
+        try:
+            user_input = input("Enter a command: ")
+            command, *args = parse_input(user_input)
+
+            if command in ["close", "exit"]:
+                messander.send_to_user("Good bye!")
+                break
+            elif command == "hello":
+                messander.send_to_user("How can I help you?")
+
+            elif command == "add":
+                messander.send_to_user(add_contact(args, book))
+
+            elif command == 'change':
+                messander.send_to_user(change_contact(args, book))
+
+            elif command == 'phone':
+                messander.send_to_user(show_phone(args, book))
+
+            elif command == 'all':
+                messander.send_to_user(show_all(book))
+
+            elif command == "add-birthday":
+                messander.send_to_user(add_birthday(args, book))
+
+            elif command == "show-birthday":
+                messander.send_to_user(show_birthday(args, book))
+
+            elif command == "birthday":
+                messander.send_to_user(birthdays(book))
+            
+            else:
+                messander.send_to_user("Invalid command.")
+
+            save_data(book)
+        except KeyboardInterrupt:
+            save_data(book)
 
 if __name__ == "__main__":
     main()
