@@ -1,0 +1,10 @@
+version: "3.12"
+services:
+  web:
+    build: .
+
+    container_name: 'Home_Work_Bots'
+    ports:
+      - "3000:5000"
+
+# docker run -it 8b98d9aa3539

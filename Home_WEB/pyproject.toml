@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "solution"
+name = "home-web"
 version = "0.1.0"
 description = ""
 authors = ["Serhii Chervonospako <novikatmospro@gmail.com>"]
